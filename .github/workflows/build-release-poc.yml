@@ -47,42 +47,7 @@ jobs:
         with:
           name: windows-x64-build
           path: Vintage-Repair-Toolbox-windows-x64.zip
-
-  ###############################################################
-  # WINDOWS BUILD (x86)
-  ###############################################################
-  build-windows-x86:
-    name: Build Windows x86
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Publish Windows x86
-        run: |
-          dotnet publish Vintage-Repair-Toolbox.csproj `
-            -c Release `
-            -r win-x86 `
-            --self-contained `
-            -p:PublishSingleFile=true `
-            -o publish/windows-x86
-
-      - name: ZIP Windows x86 build
-        run: |
-          Compress-Archive -Path publish/windows-x86/* `
-            -DestinationPath Vintage-Repair-Toolbox-windows-x86.zip
-
-      - name: Upload Windows x86 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-x86-build
-          path: Vintage-Repair-Toolbox-windows-x86.zip
-
+  
   ###############################################################
   # LINUX BUILD
   ###############################################################
@@ -203,7 +168,6 @@ jobs:
             | Platform | File |
             |----------|------|
             | Windows x64 | `Vintage-Repair-Toolbox-windows-x64.zip` |
-            | Windows x86 | `Vintage-Repair-Toolbox-windows-x86.zip` |
             | Linux x64 | `Vintage-Repair-Toolbox-linux-x64.zip` |
             | macOS Intel | `Vintage-Repair-Toolbox-macos-x64.zip` |
             | macOS Apple Silicon | `Vintage-Repair-Toolbox-macos-arm64.zip` |
