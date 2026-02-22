@@ -30,7 +30,7 @@ jobs:
 
       - name: Publish Windows
         run: |
-          dotnet publish PoC/PoC_1.csproj `
+          dotnet publish Vintage-Repair-Toolbox.csproj `
             -c Release `
             -r win-x64 `
             --self-contained `
@@ -65,7 +65,7 @@ jobs:
 
       - name: Publish Linux
         run: |
-          dotnet publish PoC/PoC_1.csproj \
+          dotnet publish Vintage-Repair-Toolbox.csproj \
             -c Release \
             -r linux-x64 \
             --self-contained \
@@ -100,7 +100,7 @@ jobs:
 
       - name: Publish macOS (Intel)
         run: |
-          dotnet publish PoC/PoC_1.csproj \
+          dotnet publish Vintage-Repair-Toolbox.csproj \
             -c Release \
             -r osx-x64 \
             --self-contained \
@@ -109,7 +109,7 @@ jobs:
 
       - name: Publish macOS (Apple Silicon)
         run: |
-          dotnet publish PoC/PoC_1.csproj \
+          dotnet publish Vintage-Repair-Toolbox.csproj \
             -c Release \
             -r osx-arm64 \
             --self-contained \
@@ -158,7 +158,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
-          name: "PoC - Commodore Repair Toolbox ${{ steps.tag.outputs.tag }}"
+          name: "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}"
           body: |
             ## ⚠️ This is a PoC (Proof of Concept) build — NOT a production release!
 
@@ -167,15 +167,15 @@ jobs:
             ### Downloads
             | Platform | File |
             |----------|------|
-            | 🪟 Windows x64 | `CommodoreRepairToolbox-windows-x64.zip` |
-            | 🐧 Linux x64 | `CommodoreRepairToolbox-linux-x64.zip` |
-            | 🍎 macOS Intel | `CommodoreRepairToolbox-macos-x64.zip` |
-            | 🍎 macOS Apple Silicon | `CommodoreRepairToolbox-macos-arm64.zip` |
+            | 🪟 Windows x64 | `VintageRepairToolbox-windows-x64.zip` |
+            | 🐧 Linux x64 | `VintageRepairToolbox-linux-x64.zip` |
+            | 🍎 macOS Intel | `VintageRepairToolbox-macos-x64.zip` |
+            | 🍎 macOS Apple Silicon | `VintageRepairToolbox-macos-arm64.zip` |
 
             ### How to run
-            - **Windows**: Extract the zip and run `PoC_1.exe`
-            - **Linux**: Extract, run `chmod +x PoC_1` then `./PoC_1`
-            - **macOS**: Extract and run `./PoC_1` (right-click → Open on first launch)
+            - **Windows**: Extract the zip and run `Vintage-Repair-Toolbox.exe`
+            - **Linux**: Extract, run `chmod +x Vintage-Repair-Toolbox` then `./Vintage-Repair-Toolbox`
+            - **macOS**: Extract and run `./Vintage-Repair-Toolbox` (right-click → Open on first launch)
           draft: false
           prerelease: true
           files: release-assets/*
