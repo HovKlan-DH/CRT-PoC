@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 
 namespace VRT
 {
@@ -10,7 +9,7 @@ namespace VRT
         public Main()
         {
             InitializeComponent();
-            this.SubscribePanelSizeChanges();
+            SubscribePanelSizeChanges();
         }
 
         // ###########################################################################################
@@ -18,16 +17,16 @@ namespace VRT
         // ###########################################################################################
         private void SubscribePanelSizeChanges()
         {
-            this.LeftPanel.PropertyChanged += (s, e) =>
+            LeftPanel.PropertyChanged += (s, e) =>
             {
                 if (e.Property == Visual.BoundsProperty)
-                    this.LeftSizeLabel.Text = $"{this.LeftPanel.Bounds.Width:F0} × {this.LeftPanel.Bounds.Height:F0}";
+                    LeftSizeLabel.Text = $"{this.LeftPanel.Bounds.Width:F0} × {this.LeftPanel.Bounds.Height:F0}";
             };
 
-            this.RightPanel.PropertyChanged += (s, e) =>
+            RightPanel.PropertyChanged += (s, e) =>
             {
                 if (e.Property == Visual.BoundsProperty)
-                    this.RightSizeLabel.Text = $"{this.RightPanel.Bounds.Width:F0} × {this.RightPanel.Bounds.Height:F0}";
+                    RightSizeLabel.Text = $"{this.RightPanel.Bounds.Width:F0} × {this.RightPanel.Bounds.Height:F0}";
             };
         }
 
@@ -36,7 +35,7 @@ namespace VRT
         // ###########################################################################################
         private void OnMyButtonClick(object sender, RoutedEventArgs e)
         {
-            this.StatusText.Text = "Button was clicked!";
+            StatusText.Text = "Button was clicked!";
         }
     }
 }
