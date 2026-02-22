@@ -3,3 +3,13 @@
 **Proof-of-Concept** and only for **internal use**!
 
 Not sure project will ever be realized... let's see.
+
+## Requirements
+
+Windows 10 build 1607+
+macOS 14 Sonoma or newer
+Linux
+  * glibc 2.17+
+  * OpenSSL 1.1+
+  * libicu
+  * Desktop should be `X11` or `Wayland`
