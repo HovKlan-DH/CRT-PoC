@@ -1,3 +1,5 @@
 # Vintage Repair Toolbox
 
-PoC project for now! Internal use only!
+**Proof-of-Concept** and only for **internal use**!
+
+Not sure project will ever be realized... let's see.
