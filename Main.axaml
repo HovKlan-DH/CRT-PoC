@@ -82,20 +82,29 @@
                                 <ColumnDefinition Width="*" MinWidth="100" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- Overview Image -->
-                            <Image Grid.Column="0"
-                                   Source="avares://VRT/Assets/Data/image.jpg"
-                                   Stretch="Uniform"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch" />
+                            <!-- Schematics Image Panel (zoomable) -->
+                            <Border Grid.Column="0"
+                                    x:Name="SchematicsContainer"
+                                    ClipToBounds="True"
+                                    PointerWheelChanged="OnSchematicsZoom">
+                                <Image x:Name="SchematicsImage"
+                                       Source="avares://VRT/Assets/Data/image.jpg"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch">
+                                    <Image.RenderTransform>
+                                        <MatrixTransform />
+                                    </Image.RenderTransform>
+                                </Image>
+                            </Border>
 
-                            <!-- Overview Splitter -->
+                            <!-- Schematics Splitter -->
                             <GridSplitter Grid.Column="1"
                                           ResizeDirection="Columns"
                                           HorizontalAlignment="Stretch"
                                           Background="Gray" />
 
-                            <!-- Overview Right Content -->
+                            <!-- Schematics Right Content -->
                             <TextBlock Grid.Column="2"
                                        Text="Details content goes here"
                                        HorizontalAlignment="Center"
