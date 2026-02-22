@@ -13,4 +13,6 @@ Not sure project will ever be realized... let's see.
   - glibc 2.17+
   - OpenSSL 1.1+
   - libicu
-  - Desktop should be `X11` or `Wayland`
+  - Desktop:
+    - X11
+    - Wayland
