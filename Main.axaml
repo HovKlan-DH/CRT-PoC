@@ -2,9 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VRT"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="VRT.Main"
-        Title="VRT AvaloniaUI"
+        Title="Vintage Repair Toolbox"
         MinWidth="400"
         MinHeight="300">
 
@@ -48,14 +49,37 @@
                 BorderThickness="1"
                 Padding="16">
             <Grid>
-                <TextBlock Text="Left Panel"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Size label -->
                 <TextBlock x:Name="LeftSizeLabel"
+                           Grid.Row="0"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Top"
                            FontSize="11"
                            Foreground="Gray" />
+
+                <!-- Hardware and Board selectors -->
+                <StackPanel Grid.Row="1"
+                            Spacing="4"
+                            VerticalAlignment="Top"
+                            Margin="0,8,0,0">
+                    <TextBlock Text="Hardware"
+                               FontSize="11"
+                               Foreground="Gray" />
+                    <ComboBox x:Name="HardwareComboBox"
+                              HorizontalAlignment="Stretch" />
+                    <TextBlock Text="Board"
+                               FontSize="11"
+                               Foreground="Gray"
+                               Margin="0,8,0,0" />
+                    <ComboBox x:Name="BoardComboBox"
+                              HorizontalAlignment="Stretch" />
+                </StackPanel>
+
             </Grid>
         </Border>
 
@@ -88,10 +112,11 @@
                                     ClipToBounds="True"
                                     PointerWheelChanged="OnSchematicsZoom">
                                 <Image x:Name="SchematicsImage"
-                                       Source="avares://VRT/Assets/Data/image.jpg"
+                                       Source="avares://Vintage-Repair-Toolbox/Assets/Data/image.jpg"
                                        Stretch="Uniform"
                                        HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch">
+                                       VerticalAlignment="Stretch"
+                                       RenderTransformOrigin="0%,0%">
                                     <Image.RenderTransform>
                                         <MatrixTransform />
                                     </Image.RenderTransform>
@@ -104,11 +129,55 @@
                                           HorizontalAlignment="Stretch"
                                           Background="Gray" />
 
-                            <!-- Schematics Right Content -->
-                            <TextBlock Grid.Column="2"
-                                       Text="Details content goes here"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" />
+                            <!-- Schematics Right Content - Thumbnail Gallery -->
+                            <ListBox x:Name="SchematicsThumbnailList"
+                                     Grid.Column="2"
+                                     Background="Transparent"
+                                     SelectionMode="Single"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+                                <ListBox.Styles>
+
+                                    <!-- Remove default pointer-over and selection backgrounds -->
+                                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+
+                                    <!-- Ensure each item stretches to fill the full panel width -->
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="Padding"                     Value="0" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    </Style>
+
+                                    <!-- Default thumbnail border: 1px black -->
+                                    <Style Selector="ListBoxItem Border.ThumbnailBorder">
+                                        <Setter Property="BorderBrush"     Value="Black" />
+                                        <Setter Property="BorderThickness" Value="1" />
+                                    </Style>
+
+                                    <!-- Selected thumbnail border: thicker IndianRed -->
+                                    <Style Selector="ListBoxItem:selected Border.ThumbnailBorder">
+                                        <Setter Property="BorderBrush"     Value="IndianRed" />
+                                        <Setter Property="BorderThickness" Value="3" />
+                                    </Style>
+
+                                </ListBox.Styles>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="local:SchematicThumbnail">
+                                        <Border Classes="ThumbnailBorder"
+                                                Margin="4"
+                                                HorizontalAlignment="Stretch">
+                                            <Image Source="{Binding ImageSource}"
+                                                   Stretch="Uniform"
+                                                   HorizontalAlignment="Stretch"
+                                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
 
                         </Grid>
                     </TabItem>

@@ -8,16 +8,28 @@
         ShowInTaskbar="False"
         Topmost="True">
 
-    <Grid Background="IndianRed">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+    <Grid Background="White">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
             <TextBlock Text="My Application"
                        FontSize="36"
                        Foreground="White"
                        HorizontalAlignment="Center" />
-            <TextBlock Text="Loading, please wait..."
+            <TextBlock x:Name="StatusLabel"
+                       Text="Loading, please wait..."
                        FontSize="14"
-                       Foreground="#888888"
-                       HorizontalAlignment="Center" />
+                       Foreground="Black"
+                       HorizontalAlignment="Center"
+                       Margin="0,12,0,0" />
+            <TextBlock x:Name="FileLabel"
+                       Text=""
+                       FontSize="12"
+                       Foreground="Black"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       MaxWidth="520"
+                       TextTrimming="CharacterEllipsis"
+                       IsVisible="False" />
         </StackPanel>
     </Grid>
+
 </Window>
