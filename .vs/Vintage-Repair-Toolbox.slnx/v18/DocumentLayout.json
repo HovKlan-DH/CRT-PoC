@@ -3,12 +3,24 @@
   "WorkspaceRootPath": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2B75AF9-0047-4DFD-9DEE-FEAC809CC04C}|Vintage-Repair-Toolbox.csproj|d:\\data\\development\\visual studio\\vintage-repair-toolbox\\mainwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
-      "RelativeMoniker": "D:0:0:{A2B75AF9-0047-4DFD-9DEE-FEAC809CC04C}|Vintage-Repair-Toolbox.csproj|solutionrelative:mainwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+      "AbsoluteMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|d:\\data\\development\\visual studio\\vintage-repair-toolbox\\main.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|solutionrelative:main.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2B75AF9-0047-4DFD-9DEE-FEAC809CC04C}|Vintage-Repair-Toolbox.csproj|d:\\data\\development\\visual studio\\vintage-repair-toolbox\\mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2B75AF9-0047-4DFD-9DEE-FEAC809CC04C}|Vintage-Repair-Toolbox.csproj|solutionrelative:mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|d:\\data\\development\\visual studio\\vintage-repair-toolbox\\main.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|solutionrelative:main.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|d:\\data\\development\\visual studio\\vintage-repair-toolbox\\app.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|solutionrelative:app.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|d:\\data\\development\\visual studio\\vintage-repair-toolbox\\splash.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|solutionrelative:splash.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|d:\\data\\development\\visual studio\\vintage-repair-toolbox\\splash.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D663CD4-A841-7CE6-FBAE-60F065B81E3F}|Vintage-Repair-Toolbox.csproj|solutionrelative:splash.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 192,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,12 +58,37 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Splash.axaml",
+              "DocumentMoniker": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Splash.axaml",
+              "RelativeDocumentMoniker": "Splash.axaml",
+              "ToolTip": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Splash.axaml",
+              "RelativeToolTip": "Splash.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-22T13:12:52.39Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Splash.axaml.cs",
+              "DocumentMoniker": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Splash.axaml.cs",
+              "RelativeDocumentMoniker": "Splash.axaml.cs",
+              "ToolTip": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Splash.axaml.cs",
+              "RelativeToolTip": "Splash.axaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-22T13:12:52.249Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "MainWindow.axaml",
-              "DocumentMoniker": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\MainWindow.axaml",
-              "RelativeDocumentMoniker": "MainWindow.axaml",
-              "ToolTip": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\MainWindow.axaml",
-              "RelativeToolTip": "MainWindow.axaml",
+              "Title": "Main.axaml",
+              "DocumentMoniker": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Main.axaml",
+              "RelativeDocumentMoniker": "Main.axaml",
+              "ToolTip": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Main.axaml \u2B24",
+              "RelativeToolTip": "Main.axaml \u2B24",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-02-22T13:08:21.101Z",
               "EditorCaption": ""
@@ -59,14 +96,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "MainWindow.axaml.cs",
-              "DocumentMoniker": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\MainWindow.axaml.cs",
-              "RelativeDocumentMoniker": "MainWindow.axaml.cs",
-              "ToolTip": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\MainWindow.axaml.cs",
-              "RelativeToolTip": "MainWindow.axaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "Main.axaml.cs",
+              "DocumentMoniker": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Main.axaml.cs",
+              "RelativeDocumentMoniker": "Main.axaml.cs",
+              "ToolTip": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\Main.axaml.cs",
+              "RelativeToolTip": "Main.axaml.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAkAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-22T13:08:20.003Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "App.axaml.cs",
+              "DocumentMoniker": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\App.axaml.cs",
+              "RelativeDocumentMoniker": "App.axaml.cs",
+              "ToolTip": "D:\\Data\\Development\\Visual Studio\\Vintage-Repair-Toolbox\\App.axaml.cs",
+              "RelativeToolTip": "App.axaml.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAArwCIAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-22T13:20:43.117Z",
               "EditorCaption": ""
             }
           ]

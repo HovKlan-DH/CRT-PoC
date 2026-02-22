@@ -14,7 +14,7 @@ namespace Vintage_Repair_Toolbox
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
+            => AppBuilder.Configure<VRT.App>()
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace();

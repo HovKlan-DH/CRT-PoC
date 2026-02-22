@@ -1,0 +1,167 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="VRT.Main"
+        Title="VRT AvaloniaUI"
+        MinWidth="400"
+        MinHeight="300">
+
+    <Window.Styles>
+
+        <!-- Base tab font size and reduced vertical padding -->
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="12,4" />
+        </Style>
+
+        <!-- Hover: tint the header text -->
+        <Style Selector="TabItem:pointerover">
+            <Setter Property="Foreground" Value="IndianRed" />
+        </Style>
+
+        <!-- Hover: show a faint underline indicator -->
+        <Style Selector="TabItem:pointerover /template/ Border#PART_SelectedPipe">
+            <Setter Property="IsVisible" Value="True" />
+            <Setter Property="Background" Value="LightCoral" />
+        </Style>
+
+        <!-- Selected: solid underline indicator -->
+        <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
+            <Setter Property="Background" Value="IndianRed" />
+        </Style>
+
+    </Window.Styles>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" MinWidth="80" />
+            <ColumnDefinition Width="4" />
+            <ColumnDefinition Width="*" MinWidth="100" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel -->
+        <Border x:Name="LeftPanel"
+                Grid.Column="0"
+                BorderBrush="IndianRed"
+                BorderThickness="1"
+                Padding="16">
+            <Grid>
+                <TextBlock Text="Left Panel"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+                <TextBlock x:Name="LeftSizeLabel"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Top"
+                           FontSize="11"
+                           Foreground="Gray" />
+            </Grid>
+        </Border>
+
+        <!-- Left Splitter -->
+        <GridSplitter Grid.Column="1"
+                      ResizeDirection="Columns"
+                      HorizontalAlignment="Stretch"
+                      Background="Gray" />
+
+        <!-- Right Panel -->
+        <Border x:Name="RightPanel"
+                Grid.Column="2"
+                BorderBrush="IndianRed"
+                BorderThickness="1"
+                Padding="16,0,16,16">
+            <Grid>
+                <TabControl>
+
+                    <TabItem Header="Schematics">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MinWidth="80" />
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition Width="*" MinWidth="100" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Overview Image -->
+                            <Image Grid.Column="0"
+                                   Source="avares://VRT/Assets/Data/image.jpg"
+                                   Stretch="Uniform"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" />
+
+                            <!-- Overview Splitter -->
+                            <GridSplitter Grid.Column="1"
+                                          ResizeDirection="Columns"
+                                          HorizontalAlignment="Stretch"
+                                          Background="Gray" />
+
+                            <!-- Overview Right Content -->
+                            <TextBlock Grid.Column="2"
+                                       Text="Details content goes here"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="Overview">
+                        <StackPanel Spacing="16"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+
+                            <TextBlock x:Name="RightSizeLabel"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Top"
+                               FontSize="11"
+                               Foreground="Gray" />
+
+                            <Button x:Name="MyButton"
+                                    Content="Click me!"
+                                    Click="OnMyButtonClick"
+                                    Background="LightBlue" />
+                            <TextBlock x:Name="StatusText"
+                                       Text="Waiting for click..."
+                                       Background="LightYellow"
+                                       Foreground="DarkBlue"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </TabItem>
+
+                    <TabItem Header="Resources">
+                        <TextBlock Text="Details content goes here"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </TabItem>
+
+                    <TabItem Header="Configuration">
+                        <TextBlock Text="Details content goes here"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </TabItem>
+
+                    <TabItem Header="Feedback">
+                        <TextBlock Text="Details content goes here"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </TabItem>
+
+                    <TabItem Header="Help">
+                        <TextBlock Text="Details content goes here"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </TabItem>
+
+                    <TabItem Header="About">
+                        <TextBlock Text="Details content goes here"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </TabItem>
+
+                </TabControl>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</Window>
