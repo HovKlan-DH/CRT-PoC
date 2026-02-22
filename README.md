@@ -6,10 +6,11 @@ Not sure project will ever be realized... let's see.
 
 ## Requirements
 
-Windows 10 build 1607+
-macOS 14 Sonoma or newer
-Linux
-  * glibc 2.17+
-  * OpenSSL 1.1+
-  * libicu
-  * Desktop should be `X11` or `Wayland`
+- .NET10
+- Windows 10 build 1607 or newer
+- macOS 14 (Sonoma) or newer
+- Linux:
+  - glibc 2.17+
+  - OpenSSL 1.1+
+  - libicu
+  - Desktop should be `X11` or `Wayland`
