@@ -1,2 +1,3 @@
-# Vintage-Repair-Toolbox
-Something
+# Vintage Repair Toolbox
+
+PoC project for now! Internal use only!
