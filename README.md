@@ -1,4 +1,4 @@
-# Vintage Repair Toolbox
+# PoC for Commodore Repair Toolbox
 
 **Proof-of-Concept** and only for **internal use**!
 
