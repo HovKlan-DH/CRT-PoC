@@ -1,4 +1,4 @@
-name: Build and Release (Win/Linux/Mac)
+name: Build and Release (Win/Linux/macOS)
 
 on:
   push:
@@ -63,7 +63,7 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish Linux
+      - name: Publish Linux x64
         run: |
           dotnet publish Vintage-Repair-Toolbox.csproj \
             -c Release \
@@ -72,7 +72,7 @@ jobs:
             -p:PublishSingleFile=true \
             -o publish/linux
 
-      - name: ZIP Linux build
+      - name: ZIP Linux x64 build
         run: |
           cd publish/linux
           zip -r ../../Vintage-Repair-Toolbox-linux-x64.zip .
@@ -98,7 +98,7 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish macOS (Intel)
+      - name: Publish macOS x64 (Intel)
         run: |
           dotnet publish Vintage-Repair-Toolbox.csproj \
             -c Release \
@@ -107,7 +107,7 @@ jobs:
             -p:PublishSingleFile=true \
             -o publish/macos-x64
 
-      - name: Publish macOS (Apple Silicon)
+      - name: Publish macOS x64 (Apple Silicon)
         run: |
           dotnet publish Vintage-Repair-Toolbox.csproj \
             -c Release \
@@ -116,7 +116,7 @@ jobs:
             -p:PublishSingleFile=true \
             -o publish/macos-arm64
 
-      - name: ZIP macOS builds
+      - name: ZIP macOS x64 builds
         run: |
           cd publish/macos-x64
           zip -r ../../Vintage-Repair-Toolbox-macos-x64.zip .
@@ -160,7 +160,7 @@ jobs:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}"
           body: |
-            ## ⚠️ This is a PoC (Proof of Concept) build — NOT a production release!
+            ## ⚠️ This is a PoC (Proof-of-Concept) build - NOT a production release!!!
 
             This is an experimental Avalonia UI cross-platform build for testing purposes only.
 
@@ -168,14 +168,14 @@ jobs:
             | Platform | File |
             |----------|------|
             | Windows x64 | `Vintage-Repair-Toolbox-windows-x64.zip` |
-            | Linux | `Vintage-Repair-Toolbox-linux-x64.zip` |
-            | macOS Intel | `Vintage-Repair-Toolbox-macos-x64.zip` |
-            | macOS Apple Silicon | `Vintage-Repair-Toolbox-macos-arm64.zip` |
+            | Linux x64 | `Vintage-Repair-Toolbox-linux-x64.zip` |
+            | macOS x64 Intel | `Vintage-Repair-Toolbox-macos-x64.zip` |
+            | macOS arm64 Apple Silicon | `Vintage-Repair-Toolbox-macos-arm64.zip` |
 
             ### How to run
-            - **Windows**: Extract the zip and run `Vintage-Repair-Toolbox.exe`
-            - **Linux**: Extract, run `chmod +x Vintage-Repair-Toolbox` then `./Vintage-Repair-Toolbox`
-            - **macOS**: Extract and run `./Vintage-Repair-Toolbox` (right-click → Open on first launch)
+            - **Windows**: Extract ZIP and run `Vintage-Repair-Toolbox.exe`
+            - **Linux**: Extract ZIP, run `chmod +x Vintage-Repair-Toolbox` and then run `./Vintage-Repair-Toolbox`
+            - **macOS**: Extract ZIP and run `./Vintage-Repair-Toolbox` (right-click → Open on first launch)
           draft: false
           prerelease: true
           files: release-assets/*
