@@ -4,7 +4,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-namespace VRT
+namespace CRT
 {
     public partial class App : Application
     {
@@ -19,7 +19,7 @@ namespace VRT
         public override async void OnFrameworkInitializationCompleted()
         {
             Logger.Initialize();
-            Logger.Info("Vintage Repair Toolbox launched");
+            Logger.Info("Commodore Repair Toolbox launched");
 
             var os = RuntimeInformation.OSDescription;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Environment.OSVersion.Version.Build >= 22000)

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VRT
+namespace CRT
 {
     public class BoardSchematicEntry
     {

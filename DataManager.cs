@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VRT
+namespace CRT
 {
     public static class DataManager
     {
         private const string DataRootArg = "--data-root=";
-        private const string MainExcelFileName = "Vintage-Repair-Toolbox.xlsx";
+        private const string MainExcelFileName = "Commodore-Repair-Toolbox.xlsx";
         private const string SheetHardwareBoard = "Hardware & Board";
 
         // Column header names used for robust, order-independent column mapping

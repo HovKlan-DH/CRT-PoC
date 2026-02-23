@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace VRT
+namespace CRT
 {
     public enum LogCategory
     {

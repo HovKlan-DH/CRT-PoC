@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Vintage-Repair-Toolbox</AssemblyName>
+    <AssemblyName>Commodore-Repair-Toolbox</AssemblyName>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -8,7 +8,19 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <RuntimeIdentifiers>win-x86;win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
-    <AssemblyTitle>Vintage Repair Toolbox</AssemblyTitle>
+    <AssemblyTitle>Commodore Repair Toolbox</AssemblyTitle>
+    <Title>Commodore Repair Toolbox</Title>
+    <Product>Commodore Repair Toolbox</Product>
+    <Company>HovKlan</Company>
+    <Authors>Dennis Helligsoe</Authors>
+    <Copyright>©2025-2026</Copyright>
+    <PackageProjectUrl>https://github.com/HovKlan-DH/Commodore-Retro-Toolbox</PackageProjectUrl>
+    <PackageIcon>Commodore icon.png</PackageIcon>
+    <AssemblyVersion>2026.2.23.1</AssemblyVersion>
+    <FileVersion>2026.2.23.1</FileVersion>
+    <Version>$(AssemblyVersion)</Version>
+    <Description>A utility tool for Commodore hardware repairing, troubleshooting and diagnosing.</Description>
+    <ApplicationIcon>Assets\Commodore icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +40,11 @@
     <Compile Update="Main.axaml.cs">
       <DependentUpon>Main.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Update="Splash.axaml.cs">
       <DependentUpon>Splash.axaml</DependentUpon>
     </Compile>
@@ -38,7 +55,25 @@
  </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\Commodore icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\Commodore icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace Vintage_Repair_Toolbox
+namespace Commodore_Repair_Toolbox
 {
     internal class Program
     {
@@ -14,7 +14,7 @@ namespace Vintage_Repair_Toolbox
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<VRT.App>()
+            => AppBuilder.Configure<CRT.App>()
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace();

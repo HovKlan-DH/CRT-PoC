@@ -2,10 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:VRT"
+        xmlns:local="clr-namespace:CRT"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="VRT.Main"
-        Title="Vintage Repair Toolbox"
+        x:Class="CRT.Main"
+        Title="Commodore Repair Toolbox"
         MinWidth="400"
         MinHeight="300">
 
@@ -110,9 +110,11 @@
                             <Border Grid.Column="0"
                                     x:Name="SchematicsContainer"
                                     ClipToBounds="True"
-                                    PointerWheelChanged="OnSchematicsZoom">
+                                    PointerWheelChanged="OnSchematicsZoom"
+                                    PointerPressed="OnSchematicsPointerPressed"
+                                    PointerMoved="OnSchematicsPointerMoved"
+                                    PointerReleased="OnSchematicsPointerReleased">
                                 <Image x:Name="SchematicsImage"
-                                       Source="avares://Vintage-Repair-Toolbox/Assets/Data/image.jpg"
                                        Stretch="Uniform"
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Stretch"

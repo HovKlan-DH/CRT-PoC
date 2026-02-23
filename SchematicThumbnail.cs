@@ -1,6 +1,6 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Media;
 
-namespace VRT
+namespace CRT
 {
     // ###########################################################################################
     // Represents a single schematic thumbnail item for display in the Schematics tab gallery.
@@ -8,6 +8,7 @@ namespace VRT
     public class SchematicThumbnail
     {
         public string Name { get; init; } = string.Empty;
-        public Bitmap? ImageSource { get; init; }
+        public string ImageFilePath { get; init; } = string.Empty;
+        public IImage? ImageSource { get; init; }
     }
 }
