@@ -116,9 +116,10 @@
                                     PointerReleased="OnSchematicsPointerReleased">
                                 <Image x:Name="SchematicsImage"
                                        Stretch="Uniform"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch"
-                                       RenderTransformOrigin="0%,0%">
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       RenderTransformOrigin="0%,0%"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality">
                                     <Image.RenderTransform>
                                         <MatrixTransform />
                                     </Image.RenderTransform>

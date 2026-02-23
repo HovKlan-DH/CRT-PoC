@@ -18,7 +18,7 @@ namespace CRT
     {
         // Zoom
         private Matrix _schematicsMatrix = Matrix.Identity;
-        private const double SchematicsZoomFactor = 1.2;
+        private const double SchematicsZoomFactor = 1.5;
         private const double SchematicsMinZoom = 0.9;
         private const double SchematicsMaxZoom = 20.0;
 
@@ -38,6 +38,10 @@ namespace CRT
         public Main()
         {
             InitializeComponent();
+
+            // Align the visual transform origin with the top-left coordinate system used in ClampSchematicsMatrix
+            this.SchematicsImage.RenderTransformOrigin = RelativePoint.TopLeft;
+
             this.SubscribePanelSizeChanges();
             this.HardwareComboBox.SelectionChanged += this.OnHardwareSelectionChanged;
             this.BoardComboBox.SelectionChanged += this.OnBoardSelectionChanged;
@@ -248,31 +252,33 @@ namespace CRT
         // ###########################################################################################
         private Rect GetImageContentRect()
         {
-            var containerSize = this.SchematicsContainer.Bounds.Size;
+            var imageSize = this.SchematicsImage.Bounds.Size;
             var bitmap = this._currentFullResBitmap;
 
-            if (bitmap == null || containerSize.Width <= 0 || containerSize.Height <= 0)
-                return new Rect(containerSize);
+            if (bitmap == null || imageSize.Width <= 0 || imageSize.Height <= 0)
+                return new Rect(imageSize);
 
-            double containerAspect = containerSize.Width / containerSize.Height;
-            double bitmapAspect = (double)bitmap.PixelSize.Width / bitmap.PixelSize.Height;
+            double containerAspect = imageSize.Width / imageSize.Height;
+
+            // Use .Size (logical dimensions) instead of .PixelSize to account for image DPI metadata
+            double bitmapAspect = bitmap.Size.Width / bitmap.Size.Height;
 
             double contentX, contentY, contentWidth, contentHeight;
 
             if (bitmapAspect > containerAspect)
             {
                 // Letterbox top and bottom
-                contentWidth = containerSize.Width;
-                contentHeight = containerSize.Width / bitmapAspect;
+                contentWidth = imageSize.Width;
+                contentHeight = imageSize.Width / bitmapAspect;
                 contentX = 0;
-                contentY = (containerSize.Height - contentHeight) / 2.0;
+                contentY = (imageSize.Height - contentHeight) / 2.0;
             }
             else
             {
                 // Letterbox left and right
-                contentHeight = containerSize.Height;
-                contentWidth = containerSize.Height * bitmapAspect;
-                contentX = (containerSize.Width - contentWidth) / 2.0;
+                contentHeight = imageSize.Height;
+                contentWidth = imageSize.Height * bitmapAspect;
+                contentX = (imageSize.Width - contentWidth) / 2.0;
                 contentY = 0;
             }
 
@@ -295,12 +301,14 @@ namespace CRT
             double tx = this._schematicsMatrix.M31;
             double ty = this._schematicsMatrix.M32;
 
-            double scaledWidth = scale * contentRect.Width;
-            double scaledHeight = scale * contentRect.Height;
-            double scaledLeft = scale * contentRect.Left + tx;
-            double scaledTop = scale * contentRect.Top + ty;
-            double scaledRight = scaledLeft + scaledWidth;
-            double scaledBottom = scaledTop + scaledHeight;
+            var transformedRect = contentRect.TransformToAABB(this._schematicsMatrix);
+
+            double scaledWidth = transformedRect.Width;
+            double scaledHeight = transformedRect.Height;
+            double scaledLeft = transformedRect.Left;
+            double scaledTop = transformedRect.Top;
+            double scaledRight = transformedRect.Right;
+            double scaledBottom = transformedRect.Bottom;
 
             // Horizontal - prevent empty space; center if content is narrower than container
             if (scaledWidth >= containerSize.Width)

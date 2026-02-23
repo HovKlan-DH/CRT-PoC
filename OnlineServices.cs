@@ -18,7 +18,7 @@ namespace CRT
 
     public static class OnlineServices
     {
-        private const string ChecksumsUrl = "https://commodore-repair-toolbox.dk/vrt/dataChecksums.json";
+        private const string ChecksumsUrl = "https://commodore-repair-toolbox.dk/auto-data/dataChecksums.json";
 
         // ###########################################################################################
         // Compares every local file against the online checksum manifest and downloads anything
