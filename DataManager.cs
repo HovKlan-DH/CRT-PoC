@@ -10,6 +10,7 @@ namespace CRT
     public static class DataManager
     {
         private const string DataRootArg = "--data-root=";
+        private const string AppFolderName = "Commodore-Repair-Toolbox";
         private const string MainExcelFileName = "Commodore-Repair-Toolbox.xlsx";
         private const string SheetHardwareBoard = "Hardware & Board";
 
@@ -58,7 +59,8 @@ namespace CRT
         }
 
         // ###########################################################################################
-        // Parses --data-root from args, or falls back to a "Data" folder next to the executable.
+        // Parses --data-root from args, or falls back to a persistent AppData folder that survives
+        // Velopack updates (which replace the install directory but leave AppData untouched).
         // ###########################################################################################
         private static string ResolveDataRoot(string[] args)
         {
@@ -68,9 +70,8 @@ namespace CRT
                     return arg[DataRootArg.Length..].Trim('"', '\'');
             }
 
-            var exePath = Environment.ProcessPath ?? string.Empty;
-            var directory = Path.GetDirectoryName(exePath) ?? AppContext.BaseDirectory;
-            return Path.Combine(directory, "Data");
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(appData, AppFolderName, "Data");
         }
 
         // ###########################################################################################

@@ -16,13 +16,21 @@ namespace CRT
 
         private static UpdateManager? _manager;
         private static UpdateInfo? _pendingUpdate;
-
         private static string? _lastCheckError;
 
         // ###########################################################################################
         // Returns the error message from the last failed update check, or null if no error occurred.
         // ###########################################################################################
         public static string? LastCheckError => _lastCheckError;
+
+#if DEBUG
+        // ###########################################################################################
+        // Set to true in debug builds to simulate an available update for UI testing.
+        // Fakes the version number, progress bar, and skips the actual restart.
+        // ###########################################################################################
+        public static bool DebugSimulateUpdate { get; set; } = false;
+        private const string DebugSimulatedVersion = "99.0.0";
+#endif
 
         // ###########################################################################################
         // Checks GitHub Releases for a newer version.
@@ -33,6 +41,12 @@ namespace CRT
             _lastCheckError = null;
 
 #if DEBUG
+            if (DebugSimulateUpdate)
+            {
+                Logger.Info("Update check - simulating update available [debug]");
+                return true;
+            }
+
             _lastCheckError = "Update check disabled in debug builds";
             Logger.Info("Update check skipped - debug build");
             return null;
@@ -69,6 +83,20 @@ namespace CRT
         // ###########################################################################################
         public static async Task DownloadAndInstallAsync(Action<int>? onProgress = null)
         {
+#if DEBUG
+            if (DebugSimulateUpdate)
+            {
+                Logger.Info("Debug simulation - faking update download");
+                for (int i = 0; i <= 100; i += 5)
+                {
+                    onProgress?.Invoke(i);
+                    await Task.Delay(50);
+                }
+                Logger.Info("Debug simulation - download complete (restart skipped in debug)");
+                return;
+            }
+#endif
+
             if (_manager == null || _pendingUpdate == null)
                 throw new InvalidOperationException("No pending update - call CheckForUpdateAsync first");
 
@@ -88,7 +116,10 @@ namespace CRT
         // ###########################################################################################
         // Returns the version string of the available update, or null if none was found.
         // ###########################################################################################
-        public static string? PendingVersion
-            => _pendingUpdate?.TargetFullRelease.Version.ToString();
+        public static string? PendingVersion =>
+#if DEBUG
+            DebugSimulateUpdate ? DebugSimulatedVersion :
+#endif
+            _pendingUpdate?.TargetFullRelease.Version.ToString();
     }
 }

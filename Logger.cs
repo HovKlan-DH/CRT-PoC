@@ -16,19 +16,17 @@ namespace CRT
         private static readonly object _lock = new();
 
         // ###########################################################################################
-        // Resolves the log file path next to the executable and overwrites any previous log content.
-        // Must be called once at application startup before any logging takes place.
+        // Resolves the log file path in a persistent AppData folder that survives Velopack updates,
+        // and overwrites any previous log content. Must be called once at application startup.
         // ###########################################################################################
         public static void Initialize()
         {
-            var exePath = Environment.ProcessPath ?? string.Empty;
-            var directory = Path.GetDirectoryName(exePath) ?? AppContext.BaseDirectory;
-            var baseName = Path.GetFileNameWithoutExtension(exePath);
-
-            _logFilePath = Path.Combine(directory, $"{baseName}.log");
-
             try
             {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var directory = Path.Combine(appData, "Commodore-Repair-Toolbox");
+                Directory.CreateDirectory(directory);
+                _logFilePath = Path.Combine(directory, "Commodore-Repair-Toolbox.log");
                 File.WriteAllText(_logFilePath, string.Empty);
             }
             catch
