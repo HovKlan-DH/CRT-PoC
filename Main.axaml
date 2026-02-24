@@ -245,9 +245,44 @@
                     </TabItem>
 
                     <TabItem Header="About">
-                        <TextBlock Text="Details content goes here"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
+                        <StackPanel Spacing="12"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    MaxWidth="360">
+
+                            <TextBlock Text="Commodore Repair Toolbox"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+
+                            <TextBlock x:Name="AppVersionText"
+                                       FontSize="11"
+                                       Foreground="Gray"
+                                       HorizontalAlignment="Center" />
+
+                            <Separator Margin="0,4" />
+
+                            <TextBlock x:Name="UpdateStatusText"
+                                       Text="Checking for updates..."
+                                       FontSize="11"
+                                       Foreground="Gray"
+                                       HorizontalAlignment="Center" />
+
+                            <Button x:Name="InstallUpdateButton"
+                                    Content="Install Update"
+                                    IsVisible="False"
+                                    HorizontalAlignment="Center"
+                                    Background="IndianRed"
+                                    Foreground="White"
+                                    Click="OnInstallUpdateClick" />
+
+                            <ProgressBar x:Name="UpdateProgressBar"
+                                         IsVisible="False"
+                                         Minimum="0"
+                                         Maximum="100"
+                                         Width="280" />
+
+                        </StackPanel>
                     </TabItem>
 
                 </TabControl>

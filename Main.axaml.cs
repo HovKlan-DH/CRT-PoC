@@ -4,12 +4,14 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,6 +63,51 @@ namespace CRT
             this.BoardComboBox.SelectionChanged += this.OnBoardSelectionChanged;
             this.SchematicsThumbnailList.SelectionChanged += this.OnSchematicsThumbnailSelectionChanged;
             this.PopulateHardwareDropDown();
+
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            this.AppVersionText.Text = version != null
+                ? $"Version {version.Major}.{version.Minor}.{version.Build}"
+                : "Version unknown";
+
+            this.CheckForAppUpdate();
+        }
+
+        // ###########################################################################################
+        // Checks for an available update on startup and shows the install button if one is found.
+        // ###########################################################################################
+        private async void CheckForAppUpdate()
+        {
+            bool? available = await UpdateService.CheckForUpdateAsync();
+
+            if (available == true)
+            {
+                this.UpdateStatusText.Text = $"Version {UpdateService.PendingVersion} is available";
+                this.InstallUpdateButton.IsVisible = true;
+            }
+            else if (available == false)
+            {
+                this.UpdateStatusText.Text = "Application is up to date";
+            }
+            else
+            {
+                this.UpdateStatusText.Text = "Could not check for updates";
+            }
+        }
+
+        // ###########################################################################################
+        // Downloads and installs the pending update, showing progress, then restarts the app.
+        // ###########################################################################################
+        private async void OnInstallUpdateClick(object? sender, RoutedEventArgs e)
+        {
+            this.InstallUpdateButton.IsEnabled = false;
+            this.UpdateProgressBar.IsVisible = true;
+            this.UpdateStatusText.Text = "Downloading update...";
+
+            await UpdateService.DownloadAndInstallAsync(progress =>
+            {
+                Dispatcher.UIThread.Post(() => this.UpdateProgressBar.Value = progress);
+            });
+            // DownloadAndInstallAsync calls ApplyUpdatesAndRestart internally - app relaunches automatically
         }
 
         // ###########################################################################################
