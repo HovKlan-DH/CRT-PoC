@@ -3,13 +3,19 @@ name: Build and Release (Win/Linux/macOS)
 on:
   push:
     tags:
-      - '*'
+      - '[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag name for the release'
+        description: 'Version for this release (semver, e.g. 2.0.0)'
         required: true
-        default: '2026-February-22'
+        default: '2.0.0'
+
+env:
+  PACK_ID: Commodore-Repair-Toolbox
+  EXE_WINDOWS: Commodore-Repair-Toolbox.exe
+  EXE_UNIX: Commodore-Repair-Toolbox
+  PROJECT: Vintage-Repair-Toolbox.csproj
 
 jobs:
 
@@ -28,28 +34,42 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Set version
+        id: ver
+        shell: bash
+        run: |
+          TAG=$([[ "${{ github.event_name }}" == "workflow_dispatch" ]] && echo "${{ inputs.tag_name }}" || echo "${{ github.ref_name }}")
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+
       - name: Publish Windows x64
         run: |
-          dotnet publish Vintage-Repair-Toolbox.csproj `
+          dotnet publish ${{ env.PROJECT }} `
             -c Release `
             -r win-x64 `
             --self-contained `
-            -p:PublishSingleFile=true `
+            -p:Version=${{ steps.ver.outputs.version }} `
             -o publish/windows-x64
 
-      - name: ZIP Windows x64 build
-        run: |
-          Compress-Archive -Path publish/windows-x64/* `
-            -DestinationPath Vintage-Repair-Toolbox-windows-x64.zip
+      - name: Install vpk
+        run: dotnet tool install -g vpk
 
-      - name: Upload Windows x64 artifact
+      - name: Pack with Velopack
+        run: |
+          vpk pack `
+            --packId ${{ env.PACK_ID }} `
+            --packVersion ${{ steps.ver.outputs.version }} `
+            --packDir publish/windows-x64 `
+            --mainExe ${{ env.EXE_WINDOWS }} `
+            --outputDir velopack-output
+
+      - name: Upload Velopack artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: windows-x64-build
-          path: Vintage-Repair-Toolbox-windows-x64.zip
-  
+          name: velopack-windows-x64
+          path: velopack-output/*
+
   ###############################################################
-  # LINUX BUILD
+  # LINUX BUILD (x64)
   ###############################################################
   build-linux:
     name: Build Linux x64
@@ -63,31 +83,92 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Set version
+        id: ver
+        run: |
+          TAG=$([[ "${{ github.event_name }}" == "workflow_dispatch" ]] && echo "${{ inputs.tag_name }}" || echo "${{ github.ref_name }}")
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+
       - name: Publish Linux x64
         run: |
-          dotnet publish Vintage-Repair-Toolbox.csproj \
+          dotnet publish ${{ env.PROJECT }} \
             -c Release \
             -r linux-x64 \
             --self-contained \
-            -p:PublishSingleFile=true \
-            -o publish/linux
+            -p:Version=${{ steps.ver.outputs.version }} \
+            -o publish/linux-x64
 
-      - name: ZIP Linux x64 build
+      - name: Install vpk
+        run: dotnet tool install -g vpk
+
+      - name: Pack with Velopack
         run: |
-          cd publish/linux
-          zip -r ../../Vintage-Repair-Toolbox-linux-x64.zip .
+          vpk pack \
+            --packId ${{ env.PACK_ID }} \
+            --packVersion ${{ steps.ver.outputs.version }} \
+            --packDir publish/linux-x64 \
+            --mainExe ${{ env.EXE_UNIX }} \
+            --outputDir velopack-output
 
-      - name: Upload Linux artifact
+      - name: Upload Velopack artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-build
-          path: Vintage-Repair-Toolbox-linux-x64.zip
+          name: velopack-linux-x64
+          path: velopack-output/*
 
   ###############################################################
-  # MACOS BUILD
+  # MACOS BUILD (Intel x64)
   ###############################################################
-  build-macos:
-    name: Build macOS x64
+  build-macos-x64:
+    name: Build macOS x64 (Intel)
+    runs-on: macos-13
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Set version
+        id: ver
+        run: |
+          TAG=$([[ "${{ github.event_name }}" == "workflow_dispatch" ]] && echo "${{ inputs.tag_name }}" || echo "${{ github.ref_name }}")
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Publish macOS x64
+        run: |
+          dotnet publish ${{ env.PROJECT }} \
+            -c Release \
+            -r osx-x64 \
+            --self-contained \
+            -p:Version=${{ steps.ver.outputs.version }} \
+            -o publish/macos-x64
+
+      - name: Install vpk
+        run: dotnet tool install -g vpk
+
+      - name: Pack with Velopack
+        run: |
+          vpk pack \
+            --packId ${{ env.PACK_ID }} \
+            --packVersion ${{ steps.ver.outputs.version }} \
+            --packDir publish/macos-x64 \
+            --mainExe ${{ env.EXE_UNIX }} \
+            --outputDir velopack-output
+
+      - name: Upload Velopack artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: velopack-macos-x64
+          path: velopack-output/*
+
+  ###############################################################
+  # MACOS BUILD (Apple Silicon arm64)
+  ###############################################################
+  build-macos-arm64:
+    name: Build macOS arm64 (Apple Silicon)
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -98,36 +179,38 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish macOS x64 (Intel)
+      - name: Set version
+        id: ver
         run: |
-          dotnet publish Vintage-Repair-Toolbox.csproj \
-            -c Release \
-            -r osx-x64 \
-            --self-contained \
-            -p:PublishSingleFile=true \
-            -o publish/macos-x64
+          TAG=$([[ "${{ github.event_name }}" == "workflow_dispatch" ]] && echo "${{ inputs.tag_name }}" || echo "${{ github.ref_name }}")
+          echo "version=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Publish macOS x64 (Apple Silicon)
+      - name: Publish macOS arm64
         run: |
-          dotnet publish Vintage-Repair-Toolbox.csproj \
+          dotnet publish ${{ env.PROJECT }} \
             -c Release \
             -r osx-arm64 \
             --self-contained \
-            -p:PublishSingleFile=true \
+            -p:Version=${{ steps.ver.outputs.version }} \
             -o publish/macos-arm64
 
-      - name: ZIP macOS x64 builds
-        run: |
-          cd publish/macos-x64
-          zip -r ../../Vintage-Repair-Toolbox-macos-x64.zip .
-          cd ../macos-arm64
-          zip -r ../../Vintage-Repair-Toolbox-macos-arm64.zip .
+      - name: Install vpk
+        run: dotnet tool install -g vpk
 
-      - name: Upload macOS artifacts
+      - name: Pack with Velopack
+        run: |
+          vpk pack \
+            --packId ${{ env.PACK_ID }} \
+            --packVersion ${{ steps.ver.outputs.version }} \
+            --packDir publish/macos-arm64 \
+            --mainExe ${{ env.EXE_UNIX }} \
+            --outputDir velopack-output
+
+      - name: Upload Velopack artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos-build
-          path: Vintage-Repair-Toolbox-macos-*.zip
+          name: velopack-macos-arm64
+          path: velopack-output/*
 
   ###############################################################
   # CREATE GITHUB RELEASE
@@ -135,14 +218,14 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [build-windows, build-linux, build-macos]
+    needs: [build-windows, build-linux, build-macos-x64, build-macos-arm64]
     permissions:
       contents: write
     steps:
-      - name: Download all artifacts
+      - name: Download all Velopack artifacts
         uses: actions/download-artifact@v4
         with:
-          path: release-assets
+          path: velopack-all
           merge-multiple: true
 
       - name: Set release tag
@@ -154,28 +237,16 @@ jobs:
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Pre-Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          name: "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}"
-          body: |
-            ## ⚠️ This is a PoC (Proof-of-Concept) build - NOT a production release!!!
+      - name: Install vpk
+        run: dotnet tool install -g vpk
 
-            This is an experimental Avalonia UI cross-platform build for testing purposes only.
-
-            ### Downloads
-            | Platform | File |
-            |----------|------|
-            | Windows x64 | `Vintage-Repair-Toolbox-windows-x64.zip` |
-            | Linux x64 | `Vintage-Repair-Toolbox-linux-x64.zip` |
-            | macOS x64 Intel | `Vintage-Repair-Toolbox-macos-x64.zip` |
-            | macOS arm64 Apple Silicon | `Vintage-Repair-Toolbox-macos-arm64.zip` |
-
-            ### How to run
-            - **Windows**: Extract ZIP and run `Vintage-Repair-Toolbox.exe`
-            - **Linux**: Extract ZIP, run `chmod +x Vintage-Repair-Toolbox` and then run `./Vintage-Repair-Toolbox`
-            - **macOS**: Extract ZIP and run `./Vintage-Repair-Toolbox` (right-click → Open on first launch)
-          draft: false
-          prerelease: true
-          files: release-assets/*
+      - name: Publish release via Velopack
+        run: |
+          vpk upload github \
+            --repoUrl https://github.com/HovKlan-DH/CRT-PoC \
+            --publish \
+            --prerelease \
+            --releaseName "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}" \
+            --tag ${{ steps.tag.outputs.tag }} \
+            --token ${{ secrets.GITHUB_TOKEN }} \
+            --inputDir velopack-all
