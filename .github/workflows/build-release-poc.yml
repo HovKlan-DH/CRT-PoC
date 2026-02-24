@@ -197,7 +197,7 @@ jobs:
       - name: Download all Velopack artifacts
         uses: actions/download-artifact@v4
         with:
-          path: velopack-all
+          path: release-assets
           merge-multiple: true
 
       - name: Set release tag
@@ -209,16 +209,23 @@ jobs:
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install vpk
-        run: dotnet tool install -g vpk
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}"
+          body: |
+            ## Velopack auto-update release
 
-      - name: Publish release via Velopack
-        run: |
-          vpk upload github \
-            --repoUrl https://github.com/HovKlan-DH/CRT-PoC \
-            --publish \
-            --prerelease \
-            --releaseName "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}" \
-            --tag ${{ steps.tag.outputs.tag }} \
-            --token ${{ secrets.GITHUB_TOKEN }} \
-            --inputDir velopack-all
+            The application will detect and offer this update automatically via the About tab.
+
+            ### Manual downloads
+            | Platform | Files |
+            |----------|-------|
+            | Windows x64 | `Commodore-Repair-Toolbox-*-win-Setup.exe` |
+            | Linux x64 | `Commodore-Repair-Toolbox-*-linux-*.AppImage` |
+            | macOS arm64 | `Commodore-Repair-Toolbox-*-osx-arm64-*.zip` |
+            | macOS x64 | `Commodore-Repair-Toolbox-*-osx-x64-*.zip` |
+          draft: false
+          prerelease: true
+          files: release-assets/*
