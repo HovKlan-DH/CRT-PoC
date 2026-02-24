@@ -47,9 +47,12 @@ namespace CRT
             else
                 Logger.Info("Checking online source for new or updated files");
 
+#if DEBUG
+            Logger.Info("DEBUG build - skipping online sync");
+#else
             RaiseStatus("Checking files against online source...");
             await OnlineServices.SyncDataAsync(_dataRoot, RaiseStatus, RaiseFileDownload);
-
+#endif
             RaiseStatus("Loading hardware definitions...");
             await Task.Run(LoadMainExcel);
         }

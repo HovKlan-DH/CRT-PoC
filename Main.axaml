@@ -113,17 +113,29 @@
                                     PointerWheelChanged="OnSchematicsZoom"
                                     PointerPressed="OnSchematicsPointerPressed"
                                     PointerMoved="OnSchematicsPointerMoved"
-                                    PointerReleased="OnSchematicsPointerReleased">
-                                <Image x:Name="SchematicsImage"
-                                       Stretch="Uniform"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Top"
-                                       RenderTransformOrigin="0%,0%"
-                                       RenderOptions.BitmapInterpolationMode="HighQuality">
-                                    <Image.RenderTransform>
-                                        <MatrixTransform />
-                                    </Image.RenderTransform>
-                                </Image>
+                                    PointerReleased="OnSchematicsPointerReleased"
+                                    Padding="0,0,0,0"
+                                    >
+                                <Grid>
+                                    <Image x:Name="SchematicsImage"
+                                           Stretch="Uniform"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Top"
+                                           RenderTransformOrigin="0%,0%"
+                                           RenderOptions.BitmapInterpolationMode="HighQuality">
+                                        <Image.RenderTransform>
+                                            <MatrixTransform />
+                                        </Image.RenderTransform>
+                                    </Image>
+
+                                    <local:SchematicHighlightsOverlay x:Name="SchematicsHighlightsOverlay"
+                                                                     IsHitTestVisible="False"
+                                                                     RenderTransformOrigin="0%,0%">
+                                        <local:SchematicHighlightsOverlay.RenderTransform>
+                                            <MatrixTransform />
+                                        </local:SchematicHighlightsOverlay.RenderTransform>
+                                    </local:SchematicHighlightsOverlay>
+                                </Grid>
                             </Border>
 
                             <!-- Schematics Splitter -->

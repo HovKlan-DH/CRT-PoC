@@ -7,6 +7,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -35,12 +36,25 @@ namespace CRT
         private Point _panStartPoint;
         private Matrix _panStartMatrix;
 
+        // Highlights
+        private const string DefaultRegion = "PAL";
+        private Dictionary<string, HighlightSpatialIndex> _highlightIndexBySchematic = new(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, BoardSchematicEntry> _schematicByName = new(StringComparer.OrdinalIgnoreCase);
+
         public Main()
         {
             InitializeComponent();
 
             // Align the visual transform origin with the top-left coordinate system used in ClampSchematicsMatrix
             this.SchematicsImage.RenderTransformOrigin = RelativePoint.TopLeft;
+            this.SchematicsHighlightsOverlay.RenderTransformOrigin = RelativePoint.TopLeft;
+
+            // Keep highlights correct after layout changes (e.g. splitter drags)
+            this.SchematicsContainer.PropertyChanged += (s, e) =>
+            {
+                if (e.Property == Visual.BoundsProperty)
+                    this.ClampSchematicsMatrix();
+            };
 
             this.SubscribePanelSizeChanges();
             this.HardwareComboBox.SelectionChanged += this.OnHardwareSelectionChanged;
@@ -102,9 +116,8 @@ namespace CRT
         }
 
         // ###########################################################################################
-        // Handles board selection changes - lazily loads board data and builds the thumbnail gallery
-        // from the "Board schematics" sheet. Full-resolution bitmaps are loaded on a background thread,
-        // then pre-scaled to thumbnail size on the UI thread before the originals are disposed.
+        // Handles board selection changes - loads board data and builds the thumbnail gallery.
+        // Also builds per-schematic highlight indices for fast viewport rendering.
         // ###########################################################################################
         private async void OnBoardSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
@@ -112,6 +125,10 @@ namespace CRT
                 (thumb.ImageSource as IDisposable)?.Dispose();
             this._currentThumbnails = [];
             this.SchematicsThumbnailList.ItemsSource = null;
+
+            this._highlightIndexBySchematic = new(StringComparer.OrdinalIgnoreCase);
+            this._schematicByName = new(StringComparer.OrdinalIgnoreCase);
+
             this.ResetSchematicsViewer();
 
             var selectedHardware = this.HardwareComboBox.SelectedItem as string;
@@ -130,6 +147,11 @@ namespace CRT
             var boardData = await DataManager.LoadBoardDataAsync(entry);
             if (boardData == null)
                 return;
+
+            // Build highlight indices (can be large)
+            var indices = await Task.Run(() => CreateHighlightIndices(boardData, DefaultRegion));
+            this._highlightIndexBySchematic = indices.HighlightIndexBySchematic;
+            this._schematicByName = indices.SchematicByName;
 
             // Load full-resolution bitmaps on a background thread
             var loaded = await Task.Run(() =>
@@ -166,7 +188,16 @@ namespace CRT
 
                 if (fullBitmap != null)
                 {
-                    thumbnailImage = CreateScaledThumbnail(fullBitmap, ThumbnailMaxWidth);
+                    if (this._highlightIndexBySchematic.TryGetValue(name, out var index) &&
+                        this._schematicByName.TryGetValue(name, out var schematic))
+                    {
+                        thumbnailImage = CreateScaledThumbnailWithHighlights(fullBitmap, ThumbnailMaxWidth, index, schematic);
+                    }
+                    else
+                    {
+                        thumbnailImage = CreateScaledThumbnail(fullBitmap, ThumbnailMaxWidth);
+                    }
+
                     fullBitmap.Dispose();
                 }
 
@@ -186,9 +217,7 @@ namespace CRT
         }
 
         // ###########################################################################################
-        // Loads the full-resolution image for the selected thumbnail on a background thread and
-        // displays it in the main viewer. Cancels any in-flight load from a previous selection,
-        // ensuring rapid switching never shows a stale image or leaks a bitmap.
+        // Loads the full-resolution image for the selected thumbnail and sets up the highlight overlay.
         // ###########################################################################################
         private async void OnSchematicsThumbnailSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
@@ -201,6 +230,11 @@ namespace CRT
             this.SchematicsImage.Source = null;
             this._schematicsMatrix = Matrix.Identity;
             ((MatrixTransform)this.SchematicsImage.RenderTransform!).Matrix = this._schematicsMatrix;
+            ((MatrixTransform)this.SchematicsHighlightsOverlay.RenderTransform!).Matrix = this._schematicsMatrix;
+
+            this.SchematicsHighlightsOverlay.HighlightIndex = null;
+            this.SchematicsHighlightsOverlay.BitmapPixelSize = new PixelSize(0, 0);
+            this.SchematicsHighlightsOverlay.ViewMatrix = this._schematicsMatrix;
 
             if (selected == null || string.IsNullOrEmpty(selected.ImageFilePath))
                 return;
@@ -227,21 +261,42 @@ namespace CRT
             this._currentFullResBitmap?.Dispose();
             this._currentFullResBitmap = bitmap;
             this.SchematicsImage.Source = bitmap;
+
+            if (bitmap != null &&
+                this._highlightIndexBySchematic.TryGetValue(selected.Name, out var index) &&
+                this._schematicByName.TryGetValue(selected.Name, out var schematic))
+            {
+                this.SchematicsHighlightsOverlay.HighlightIndex = index;
+                this.SchematicsHighlightsOverlay.BitmapPixelSize = bitmap.PixelSize;
+                this.SchematicsHighlightsOverlay.HighlightColor = ParseColorOrDefault(schematic.MainImageHighlightColor, Colors.IndianRed);
+                this.SchematicsHighlightsOverlay.HighlightOpacity = ParseOpacityOrDefault(schematic.MainHighlightOpacity, 0.20);
+            }
+
+            this.SchematicsHighlightsOverlay.ViewMatrix = this._schematicsMatrix;
+            this.SchematicsHighlightsOverlay.InvalidateVisual();
         }
 
         // ###########################################################################################
-        // Clears the main schematics image, cancels any pending full-res load, disposes the current
-        // full-res bitmap, and resets the zoom transform to the identity state.
+        // Clears the main schematics image and resets the zoom and highlight overlay state.
         // ###########################################################################################
         private void ResetSchematicsViewer()
         {
             this._fullResLoadCts?.Cancel();
             this._fullResLoadCts = null;
+
             this._currentFullResBitmap?.Dispose();
             this._currentFullResBitmap = null;
+
             this.SchematicsImage.Source = null;
+
             this._schematicsMatrix = Matrix.Identity;
             ((MatrixTransform)this.SchematicsImage.RenderTransform!).Matrix = this._schematicsMatrix;
+            ((MatrixTransform)this.SchematicsHighlightsOverlay.RenderTransform!).Matrix = this._schematicsMatrix;
+
+            this.SchematicsHighlightsOverlay.HighlightIndex = null;
+            this.SchematicsHighlightsOverlay.BitmapPixelSize = new PixelSize(0, 0);
+            this.SchematicsHighlightsOverlay.ViewMatrix = this._schematicsMatrix;
+
             this._isPanning = false;
             this.SchematicsContainer.Cursor = Cursor.Default;
         }
@@ -287,8 +342,9 @@ namespace CRT
 
         // ###########################################################################################
         // Clamps the current schematics matrix so no empty space is visible inside the container.
-        // If the scaled content is smaller than the container on an axis it is centered on that axis.
-        // Always writes the corrected matrix back to the RenderTransform.
+        // If the scaled content is smaller than the container horizontally it is centered on that axis.
+        // Vertically, content is always top-aligned. Always writes the corrected matrix back to the
+        // RenderTransform.
         // ###########################################################################################
         private void ClampSchematicsMatrix()
         {
@@ -321,7 +377,7 @@ namespace CRT
                 tx = (containerSize.Width - scaledWidth) / 2.0 - scale * contentRect.Left;
             }
 
-            // Vertical - prevent empty space; center if content is shorter than container
+            // Vertical - prevent empty space; top-align if content is shorter than container
             if (scaledHeight >= containerSize.Height)
             {
                 if (scaledTop > 0) ty -= scaledTop;
@@ -329,17 +385,19 @@ namespace CRT
             }
             else
             {
-                ty = (containerSize.Height - scaledHeight) / 2.0 - scale * contentRect.Top;
+                ty = -(scale * contentRect.Top);
             }
 
             this._schematicsMatrix = new Matrix(scale, 0, 0, scale, tx, ty);
             ((MatrixTransform)this.SchematicsImage.RenderTransform!).Matrix = this._schematicsMatrix;
+            ((MatrixTransform)this.SchematicsHighlightsOverlay.RenderTransform!).Matrix = this._schematicsMatrix;
+
+            this.SchematicsHighlightsOverlay.ViewMatrix = this._schematicsMatrix;
+            this.SchematicsHighlightsOverlay.InvalidateVisual();
         }
 
         // ###########################################################################################
-        // Creates a pre-scaled bitmap from a full-resolution source image. Uses a temporary Image
-        // control rendered to a RenderTargetBitmap. This trades a one-time scale cost at load time
-        // for smooth, zero-cost rendering during layout changes (e.g. splitter drags).
+        // Creates a pre-scaled bitmap from a full-resolution source image.
         // ###########################################################################################
         private static RenderTargetBitmap CreateScaledThumbnail(Bitmap source, int maxWidth)
         {
@@ -361,6 +419,46 @@ namespace CRT
         }
 
         // ###########################################################################################
+        // Creates a pre-scaled thumbnail and bakes component highlight overlays into it.
+        // ###########################################################################################
+        private static RenderTargetBitmap CreateScaledThumbnailWithHighlights(Bitmap source, int maxWidth, HighlightSpatialIndex index, BoardSchematicEntry schematic)
+        {
+            double scale = Math.Min(1.0, (double)maxWidth / source.PixelSize.Width);
+            int tw = Math.Max(1, (int)(source.PixelSize.Width * scale));
+            int th = Math.Max(1, (int)(source.PixelSize.Height * scale));
+
+            var root = new Grid();
+
+            var image = new Image
+            {
+                Source = source,
+                Stretch = Stretch.Uniform,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top
+            };
+
+            var overlay = new SchematicHighlightsOverlay
+            {
+                HighlightIndex = index,
+                BitmapPixelSize = source.PixelSize,
+                ViewMatrix = Matrix.Identity,
+                HighlightColor = ParseColorOrDefault(schematic.ThumbnailImageHighlightColor, Colors.IndianRed),
+                HighlightOpacity = ParseOpacityOrDefault(schematic.ThumbnailHighlightOpacity, 0.20),
+                IsHitTestVisible = false
+            };
+
+            root.Children.Add(image);
+            root.Children.Add(overlay);
+
+            root.Measure(new Size(tw, th));
+            root.Arrange(new Rect(0, 0, tw, th));
+
+            var rtb = new RenderTargetBitmap(new PixelSize(tw, th), new Vector(96, 96));
+            rtb.Render(root);
+            return rtb;
+        }
+
+        // ###########################################################################################
         // Handles the button click event and updates the status text.
         // ###########################################################################################
         private void OnMyButtonClick(object sender, RoutedEventArgs e)
@@ -370,10 +468,6 @@ namespace CRT
 
         // ###########################################################################################
         // Handles mouse wheel zoom on the Schematics image, centered on the cursor position.
-        // Builds a zoom matrix by translating the cursor to the origin, scaling, then translating back,
-        // keeping the pixel under the cursor stationary throughout the operation.
-        // When zooming out past the minimum scale, snaps back to the identity matrix to always
-        // restore the full image view regardless of accumulated translation offsets.
         // ###########################################################################################
         private void OnSchematicsZoom(object? sender, PointerWheelEventArgs e)
         {
@@ -389,6 +483,11 @@ namespace CRT
             {
                 this._schematicsMatrix = Matrix.Identity;
                 ((MatrixTransform)this.SchematicsImage.RenderTransform!).Matrix = this._schematicsMatrix;
+                ((MatrixTransform)this.SchematicsHighlightsOverlay.RenderTransform!).Matrix = this._schematicsMatrix;
+
+                this.SchematicsHighlightsOverlay.ViewMatrix = this._schematicsMatrix;
+                this.SchematicsHighlightsOverlay.InvalidateVisual();
+
                 e.Handled = true;
                 return;
             }
@@ -405,8 +504,7 @@ namespace CRT
         }
 
         // ###########################################################################################
-        // Enters pan mode when the right mouse button is pressed - captures the pointer so movement
-        // is tracked even outside the container, and switches the cursor to a hand.
+        // Enters pan mode when the right mouse button is pressed.
         // ###########################################################################################
         private void OnSchematicsPointerPressed(object? sender, PointerPressedEventArgs e)
         {
@@ -423,7 +521,6 @@ namespace CRT
 
         // ###########################################################################################
         // Translates the schematics image while the right mouse button is held down.
-        // The delta is computed from the capture start point so the image follows the cursor exactly.
         // ###########################################################################################
         private void OnSchematicsPointerMoved(object? sender, PointerEventArgs e)
         {
@@ -437,8 +534,7 @@ namespace CRT
         }
 
         // ###########################################################################################
-        // Exits pan mode when the right mouse button is released - releases pointer capture
-        // and restores the default cursor.
+        // Exits pan mode when the right mouse button is released.
         // ###########################################################################################
         private void OnSchematicsPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
@@ -449,6 +545,104 @@ namespace CRT
             this.SchematicsContainer.Cursor = Cursor.Default;
             e.Pointer.Capture(null);
             e.Handled = true;
+        }
+
+        // ###########################################################################################
+        // Creates per-schematic highlight indices, filtered by region (PAL or empty region).
+        // ###########################################################################################
+        private static (Dictionary<string, HighlightSpatialIndex> HighlightIndexBySchematic, Dictionary<string, BoardSchematicEntry> SchematicByName)
+            CreateHighlightIndices(BoardData boardData, string region)
+        {
+            var schematicByName = boardData.Schematics
+                .Where(s => !string.IsNullOrWhiteSpace(s.SchematicName))
+                .ToDictionary(s => s.SchematicName, s => s, StringComparer.OrdinalIgnoreCase);
+
+            var componentRegionByLabel = boardData.Components
+                .Where(c => !string.IsNullOrWhiteSpace(c.BoardLabel))
+                .GroupBy(c => c.BoardLabel, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First().Region ?? string.Empty, StringComparer.OrdinalIgnoreCase);
+
+            bool IsVisibleByRegion(string boardLabel)
+            {
+                if (!componentRegionByLabel.TryGetValue(boardLabel, out var r))
+                    return true;
+
+                if (string.IsNullOrWhiteSpace(r))
+                    return true;
+
+                return string.Equals(r.Trim(), region, StringComparison.OrdinalIgnoreCase);
+            }
+
+            var rectsBySchematic = new Dictionary<string, List<Rect>>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var h in boardData.ComponentHighlights)
+            {
+                if (string.IsNullOrWhiteSpace(h.SchematicName) || string.IsNullOrWhiteSpace(h.BoardLabel))
+                    continue;
+
+                if (!IsVisibleByRegion(h.BoardLabel))
+                    continue;
+
+                if (!TryParseDouble(h.X, out var x) ||
+                    !TryParseDouble(h.Y, out var y) ||
+                    !TryParseDouble(h.Width, out var w) ||
+                    !TryParseDouble(h.Height, out var hh))
+                    continue;
+
+                if (w <= 0 || hh <= 0)
+                    continue;
+
+                if (!rectsBySchematic.TryGetValue(h.SchematicName, out var list))
+                {
+                    list = [];
+                    rectsBySchematic[h.SchematicName] = list;
+                }
+
+                list.Add(new Rect(x, y, w, hh));
+            }
+
+            var indexBySchematic = new Dictionary<string, HighlightSpatialIndex>(StringComparer.OrdinalIgnoreCase);
+            foreach (var (schematicName, rects) in rectsBySchematic)
+            {
+                if (rects.Count == 0)
+                    continue;
+
+                indexBySchematic[schematicName] = new HighlightSpatialIndex(rects);
+            }
+
+            return (indexBySchematic, schematicByName);
+        }
+
+        // ###########################################################################################
+        // Parses a double using invariant culture for Excel-origin numeric text.
+        // ###########################################################################################
+        private static bool TryParseDouble(string text, out double value)
+            => double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+
+        // ###########################################################################################
+        // Parses an Avalonia color string or returns a fallback.
+        // ###########################################################################################
+        private static Color ParseColorOrDefault(string text, Color fallback)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return fallback;
+
+            try { return Color.Parse(text.Trim()); }
+            catch { return fallback; }
+        }
+
+        // ###########################################################################################
+        // Parses opacity; supports 0-1 and 0-100 (treated as percent). Returns fallback on failure.
+        // ###########################################################################################
+        private static double ParseOpacityOrDefault(string text, double fallback)
+        {
+            if (!TryParseDouble(text, out var v))
+                return fallback;
+
+            if (v > 1.0)
+                v /= 100.0;
+
+            return Math.Clamp(v, 0.0, 1.0);
         }
     }
 }
