@@ -109,7 +109,6 @@ jobs:
             --packVersion ${{ steps.ver.outputs.version }} \
             --packDir publish/linux-x64 \
             --mainExe ${{ env.EXE_UNIX }} \
-            --noPortable \
             --outputDir velopack-output
 
       - name: Upload Velopack artifacts
