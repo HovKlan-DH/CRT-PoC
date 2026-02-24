@@ -16,8 +16,8 @@
     <Copyright>©2025-2026</Copyright>
     <PackageProjectUrl>https://github.com/HovKlan-DH/Commodore-Retro-Toolbox</PackageProjectUrl>
     <PackageIcon>Commodore icon.png</PackageIcon>
-    <AssemblyVersion>2.2.0</AssemblyVersion>
-    <FileVersion>2.2.0</FileVersion>
+    <AssemblyVersion>2.3.0</AssemblyVersion>
+    <FileVersion>2.3.0</FileVersion>
     <Version>$(AssemblyVersion)</Version>
     <Description>A utility tool for Commodore hardware repairing, troubleshooting and diagnosing.</Description>
     <ApplicationIcon>Assets\Commodore icon.ico</ApplicationIcon>
