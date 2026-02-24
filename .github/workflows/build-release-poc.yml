@@ -117,58 +117,10 @@ jobs:
           path: velopack-output/*
 
   ###############################################################
-  # MACOS BUILD (Intel x64)
+  # MACOS BUILD (arm64 + x64 from single runner)
   ###############################################################
-  build-macos-x64:
-    name: Build macOS x64 (Intel)
-    runs-on: macos-13
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Set version
-        id: ver
-        run: |
-          TAG=$([[ "${{ github.event_name }}" == "workflow_dispatch" ]] && echo "${{ inputs.tag_name }}" || echo "${{ github.ref_name }}")
-          echo "version=$TAG" >> $GITHUB_OUTPUT
-
-      - name: Publish macOS x64
-        run: |
-          dotnet publish ${{ env.PROJECT }} \
-            -c Release \
-            -r osx-x64 \
-            --self-contained \
-            -p:Version=${{ steps.ver.outputs.version }} \
-            -o publish/macos-x64
-
-      - name: Install vpk
-        run: dotnet tool install -g vpk
-
-      - name: Pack with Velopack
-        run: |
-          vpk pack \
-            --packId ${{ env.PACK_ID }} \
-            --packVersion ${{ steps.ver.outputs.version }} \
-            --packDir publish/macos-x64 \
-            --mainExe ${{ env.EXE_UNIX }} \
-            --outputDir velopack-output
-
-      - name: Upload Velopack artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: velopack-macos-x64
-          path: velopack-output/*
-
-  ###############################################################
-  # MACOS BUILD (Apple Silicon arm64)
-  ###############################################################
-  build-macos-arm64:
-    name: Build macOS arm64 (Apple Silicon)
+  build-macos:
+    name: Build macOS (arm64 + x64)
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -194,22 +146,42 @@ jobs:
             -p:Version=${{ steps.ver.outputs.version }} \
             -o publish/macos-arm64
 
+      - name: Publish macOS x64
+        run: |
+          dotnet publish ${{ env.PROJECT }} \
+            -c Release \
+            -r osx-x64 \
+            --self-contained \
+            -p:Version=${{ steps.ver.outputs.version }} \
+            -o publish/macos-x64
+
       - name: Install vpk
         run: dotnet tool install -g vpk
 
-      - name: Pack with Velopack
+      - name: Pack with Velopack (macOS arm64)
         run: |
           vpk pack \
             --packId ${{ env.PACK_ID }} \
             --packVersion ${{ steps.ver.outputs.version }} \
             --packDir publish/macos-arm64 \
             --mainExe ${{ env.EXE_UNIX }} \
+            --channel osx-arm64 \
+            --outputDir velopack-output
+
+      - name: Pack with Velopack (macOS x64)
+        run: |
+          vpk pack \
+            --packId ${{ env.PACK_ID }} \
+            --packVersion ${{ steps.ver.outputs.version }} \
+            --packDir publish/macos-x64 \
+            --mainExe ${{ env.EXE_UNIX }} \
+            --channel osx-x64 \
             --outputDir velopack-output
 
       - name: Upload Velopack artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: velopack-macos-arm64
+          name: velopack-macos
           path: velopack-output/*
 
   ###############################################################
@@ -218,14 +190,14 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [build-windows, build-linux, build-macos-x64, build-macos-arm64]
+    needs: [build-windows, build-linux, build-macos]
     permissions:
       contents: write
     steps:
       - name: Download all Velopack artifacts
         uses: actions/download-artifact@v4
         with:
-          path: velopack-all
+          path: release-assets
           merge-multiple: true
 
       - name: Set release tag
@@ -237,16 +209,23 @@ jobs:
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install vpk
-        run: dotnet tool install -g vpk
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}"
+          body: |
+            ## Velopack auto-update release
 
-      - name: Publish release via Velopack
-        run: |
-          vpk upload github \
-            --repoUrl https://github.com/HovKlan-DH/CRT-PoC \
-            --publish \
-            --prerelease \
-            --releaseName "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}" \
-            --tag ${{ steps.tag.outputs.tag }} \
-            --token ${{ secrets.GITHUB_TOKEN }} \
-            --inputDir velopack-all
+            The application will detect and offer this update automatically via the About tab.
+
+            ### Manual downloads
+            | Platform | Files |
+            |----------|-------|
+            | Windows x64 | `Commodore-Repair-Toolbox-*-win-Setup.exe` |
+            | Linux x64 | `Commodore-Repair-Toolbox-*-linux-*.AppImage` |
+            | macOS arm64 | `Commodore-Repair-Toolbox-*-osx-arm64-*.zip` |
+            | macOS x64 | `Commodore-Repair-Toolbox-*-osx-x64-*.zip` |
+          draft: false
+          prerelease: true
+          files: release-assets/*
