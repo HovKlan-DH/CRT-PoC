@@ -90,7 +90,7 @@ namespace CRT
             }
             else
             {
-                this.UpdateStatusText.Text = "Could not check for updates";
+                this.UpdateStatusText.Text = $"Could not check for updates - [{UpdateService.LastCheckError}]";
             }
         }
 
