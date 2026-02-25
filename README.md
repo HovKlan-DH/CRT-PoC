@@ -19,3 +19,10 @@ Also, no need to bookmark or follow this project, as its **GitLab repository wil
     - Desktop:
       - X11
       - Wayland
+
+## Confirmed working on
+
+- Windows 10
+- Windows 11
+- ZorinOS
+- RHEL 9.7
