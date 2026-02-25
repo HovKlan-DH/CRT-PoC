@@ -60,6 +60,7 @@ jobs:
             --packVersion ${{ steps.ver.outputs.version }} `
             --packDir publish/windows-x64 `
             --mainExe ${{ env.EXE_WINDOWS }} `
+            --noPortable `
             --outputDir velopack-output
 
       - name: Upload Velopack artifacts
@@ -166,6 +167,7 @@ jobs:
             --packDir publish/macos-arm64 \
             --mainExe ${{ env.EXE_UNIX }} \
             --channel osx-arm64 \
+            --noPortable \
             --outputDir velopack-output
 
       - name: Pack with Velopack (macOS x64)
@@ -176,6 +178,7 @@ jobs:
             --packDir publish/macos-x64 \
             --mainExe ${{ env.EXE_UNIX }} \
             --channel osx-x64 \
+            --noPortable \
             --outputDir velopack-output
 
       - name: Upload Velopack artifacts
@@ -215,17 +218,23 @@ jobs:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: "PoC - Vintage Repair Toolbox ${{ steps.tag.outputs.tag }}"
           body: |
-            ## Velopack auto-update release
+            ## ⚠️ This is a PoC (Proof-of-Concept) build - NOT a production release!!!
 
-            The application will detect and offer this update automatically via the About tab.
+            ### Downloads
+            | Platform | File |
+            |----------|------|
+            | Windows x64 | `Commodore-Repair-Toolbox-win-Setup.exe` |
+            | Linux x64 | `Commodore-Repair-Toolbox.AppImage` |
+            | macOS arm64 Apple Silicon | `Commodore-Repair-Toolbox-osx-arm64-Setup.pkg` |
+            | macOS x64 Intel | `Commodore-Repair-Toolbox-osx-x64-Setup.pkg` |
 
-            ### Manual downloads
-            | Platform | Files |
-            |----------|-------|
-            | Windows x64 | `Commodore-Repair-Toolbox-*-win-Setup.exe` |
-            | Linux x64 | `Commodore-Repair-Toolbox-*-linux-*.AppImage` |
-            | macOS arm64 | `Commodore-Repair-Toolbox-*-osx-arm64-*.zip` |
-            | macOS x64 | `Commodore-Repair-Toolbox-*-osx-x64-*.zip` |
+            > The remaining files (`*.nupkg`, `*.json`) are required for the in-app auto-update feature.
           draft: false
           prerelease: true
-          files: release-assets/*
+          files: |
+            release-assets/*-Setup.exe
+            release-assets/*.AppImage
+            release-assets/*-Setup.pkg
+            release-assets/*.nupkg
+            release-assets/releases.*.json
+            release-assets/assets.*.json
