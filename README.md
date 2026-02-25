@@ -26,3 +26,4 @@ Also, no need to bookmark or follow this project, as its **GitLab repository wil
 - Windows 11
 - ZorinOS
 - RHEL 9.7
+- macOS Intel (Tahoe)
